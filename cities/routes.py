@@ -42,7 +42,7 @@ async def get_cities(db: AsyncSession = Depends(get_db),
             summary="Get city bi id",
             status_code=status.HTTP_200_OK)
 async def get_city(city_id: int, db: AsyncSession = Depends(get_db)):
-    return get_city_by_id(city_id=city_id, db=db)
+    return await get_city_by_id(city_id=city_id, db=db)
 
 
 @router.put("/{city_id}/", response_model=CityListSchema,

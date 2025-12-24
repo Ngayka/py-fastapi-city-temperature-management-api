@@ -37,7 +37,8 @@ async def update_temperature(
         if isinstance(r, Exception):
             print(f"Error fetching temperature: {r}")
         elif r is not None:
-            updated.append(r)
+            db.add(Temperature(city_id=r["city_id"], temperature=r["temp"]))
+            updated.append({"city": r["city_name"], "temp": r["temp"]})
     await db.commit()
     return {"updated": updated}
 
