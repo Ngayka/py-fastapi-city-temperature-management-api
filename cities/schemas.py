@@ -20,3 +20,8 @@ class CityListSchema(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class CityOut(BaseModel):
+    id: int
+    name: str

@@ -18,7 +18,7 @@ async def add_city(city: CityCreateSchema, db: AsyncSession = Depends(get_db)):
     return await create_city(city, db)
 
 
-@router.get("/",
+@router.get("/{city_id}/",
             response_model=List[CityListSchema],
             summary="Get one city by id, or all cities",
             status_code=status.HTTP_200_OK)
@@ -35,7 +35,7 @@ async def get_cities(city_id: Optional[int] = None,
     )
 
 
-@router.patch("/", response_model=CityListSchema,
+@router.patch("/{city_id}/", response_model=CityListSchema,
               summary="Patch city by id",
               status_code=status.HTTP_200_OK)
 async def upgrade_city(
@@ -48,7 +48,7 @@ async def upgrade_city(
         db=db)
 
 
-@router.delete("/",
+@router.delete("/{city_id}/",
                summary="Delete city by id",
                status_code=status.HTTP_404_NOT_FOUND)
 async def delete_city_by_id(
