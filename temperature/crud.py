@@ -16,8 +16,6 @@ BASE_URL = os.getenv("BASE_URL")
 
 
 async def fetch_temperature(city_name: str) -> float | None:
-    print("BASE_URL =", BASE_URL)
-    print("API_KEY =", API_KEY)
     params = {
         "q": city_name,
         "units": "metric",
@@ -31,7 +29,8 @@ async def fetch_temperature(city_name: str) -> float | None:
         return None
 
     data = response.json()
-    return data["main"]["temp"]
+    main_data = data.get("main", {})
+    return main_data.get("temp")
 
 
 async def get_cities_temperature_or_by_city_id(

@@ -11,7 +11,7 @@ class Temperature(Base):
     city_id: Mapped[int] = mapped_column(ForeignKey("cities.id"), nullable=False)
     date_time: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
-        default=datetime.now(timezone.utc),
+        default=lambda: datetime.now(timezone.utc),
         nullable=False
     )
     temperature: Mapped[float] = mapped_column(nullable=False)

@@ -19,27 +19,30 @@ async def create_city(city: CityCreateSchema, db: AsyncSession = Depends(get_db)
     return new_city
 
 
-async def get_all_cities_or_city_by_id(city_id: int | None,
-                                       db: AsyncSession = Depends(get_db),
+async def get_all_cities(db: AsyncSession = Depends(get_db),
                                        skip: int = 0,
                                        limit: int = 10
                                        ):
-    if city_id is None:
-        result = await db.execute(select(City).offset(skip).limit(limit))
-        cities = result.scalars().all()
-        return cities
+    result = await db.execute(select(City).offset(skip).limit(limit))
+    cities = result.scalars().all()
+    return cities
 
+
+async def get_city_by_id(city_id: int | None,
+                         db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(City).where(city_id == City.id))
-    city = result.scalar_one()
+    city = result.scalar_one_or_none()
     if not city:
         raise HTTPException(status_code=404, detail="City not found")
+    return city
 
-    return [city]
 
 
 async def delete_city(city_id: int, db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(City).where(city_id == City.id))
     city = result.scalar_one_or_none()
+    if not city:
+        raise HTTPException(status_code=404, detail="City not found")
     await db.delete(city)
     await db.commit()
     return {"message": "City deleted"}

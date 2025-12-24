@@ -3,7 +3,11 @@ from typing import List, Optional
 from fastapi import APIRouter, status, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from cities.crud import create_city, get_all_cities_or_city_by_id, delete_city, update_city
+from cities.crud import (create_city,
+                         get_all_cities,
+                         delete_city,
+                         update_city,
+                         get_city_by_id)
 from cities.schemas import CityListSchema, CityCreateSchema, CityUpdateSchema
 from database import get_db
 
@@ -18,26 +22,32 @@ async def add_city(city: CityCreateSchema, db: AsyncSession = Depends(get_db)):
     return await create_city(city, db)
 
 
-@router.get("/{city_id}/",
+@router.get("/",
             response_model=List[CityListSchema],
-            summary="Get one city by id, or all cities",
+            summary="Get all cities",
             status_code=status.HTTP_200_OK)
-async def get_cities(city_id: Optional[int] = None,
-                     db: AsyncSession = Depends(get_db),
+async def get_cities(db: AsyncSession = Depends(get_db),
                      skip: int = 0,
                      limit: int = 10,
                      ):
-    return await get_all_cities_or_city_by_id(
-        city_id=city_id,
+    return await get_all_cities(
         db=db,
         skip=skip,
         limit=limit
     )
 
 
-@router.patch("/{city_id}/", response_model=CityListSchema,
-              summary="Patch city by id",
-              status_code=status.HTTP_200_OK)
+@router.get("/{city_id}/",
+            response_model=CityListSchema,
+            summary="Get city bi id",
+            status_code=status.HTTP_200_OK)
+async def get_city(city_id: int, db: AsyncSession = Depends(get_db)):
+    return get_city_by_id(city_id=city_id, db=db)
+
+
+@router.put("/{city_id}/", response_model=CityListSchema,
+            summary="Patch city by id",
+            status_code=status.HTTP_200_OK)
 async def upgrade_city(
         city_id: int,
         city_data: CityUpdateSchema,
@@ -50,7 +60,7 @@ async def upgrade_city(
 
 @router.delete("/{city_id}/",
                summary="Delete city by id",
-               status_code=status.HTTP_404_NOT_FOUND)
+               status_code=status.HTTP_200_OK)
 async def delete_city_by_id(
         city_id: int,
         db: AsyncSession = Depends(get_db)

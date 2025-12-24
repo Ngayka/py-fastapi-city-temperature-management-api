@@ -31,11 +31,15 @@ async def update_temperature(
             )
             return {"city": city.name, "temp": temp}
     tasks = [process_city(city) for city in cities]
-    results = await asyncio.gather(*tasks)
+    results = await asyncio.gather(*tasks, return_exceptions=True)
+    updated = []
+    for r in results:
+        if isinstance(r, Exception):
+            print(f"Error fetching temperature: {r}")
+        elif r is not None:
+            updated.append(r)
     await db.commit()
-    return {
-        "updated": [r for r in results if r is not None]
-    }
+    return {"updated": updated}
 
 
 @router.get("/",
